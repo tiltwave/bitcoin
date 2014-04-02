@@ -1,3 +1,4 @@
+// Get current Bitcoin exchange rate from Bitfinex
 package bitfinex
 
 import (
@@ -11,6 +12,7 @@ type Bitfinex struct {
 	price  bitcoin.BitcoinPrice
 }
 
+// Ticker represents the JSON data returned from the API request
 type T struct {
 	Mid        string
 	Bid        string
@@ -19,6 +21,7 @@ type T struct {
 	timestamp  string
 }
 
+// T2 represents the JSON data returned from the API request
 type T2 struct {
 	Low    string
 	High   string
@@ -30,11 +33,14 @@ func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
 	var t2 T2
 
 	b.apiUrl = "https://api.bitfinex.com/v1/ticker/btcusd"
+
+	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
 		return bitcoin.BitcoinPrice{}, err
 	}
 
+	// Decode the JSON data
 	json.Unmarshal(content, &t)
 	curBuy, _ := strconv.ParseFloat(t.Last_price, 64)
 	curSell, _ := strconv.ParseFloat(t.Ask, 64)

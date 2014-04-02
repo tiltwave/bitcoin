@@ -1,3 +1,4 @@
+// Gets current Bitcoin exchange rate
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"time"
 )
 
+// Print the current price
 func pt(p bitcoin.BitcoinPrice) {
 	var t time.Time
 	if p.Time > 0 {
@@ -20,6 +22,7 @@ func pt(p bitcoin.BitcoinPrice) {
 }
 func main() {
 
+	// Get current exchange rate from Bitstamp
 	b := bitcoin.Bitcoin(bitstamp.Bitstamp{})
 	p, err := b.GetPrice()
 	if err != nil {
@@ -27,6 +30,7 @@ func main() {
 	}
 	pt(p)
 
+	// Get current exchange rate from Btce
 	b = bitcoin.Bitcoin(btce.Btce{})
 	p, err = b.GetPrice()
 	if err != nil {
@@ -34,6 +38,7 @@ func main() {
 	}
 	pt(p)
 
+	// Get current exchange rate from  Coinbase
 	b = bitcoin.Bitcoin(coinbase.Coinbase{})
 	p, err = b.GetPrice()
 	if err != nil {
@@ -41,6 +46,7 @@ func main() {
 	}
 	pt(p)
 
+	// Get current exchange rate from Bitfinex
 	b = bitcoin.Bitcoin(bitfinex.Bitfinex{})
 	p, err = b.GetPrice()
 	if err != nil {

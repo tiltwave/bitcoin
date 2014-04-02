@@ -25,11 +25,14 @@ type T struct {
 func (b Bitstamp) GetPrice() (bitcoin.BitcoinPrice, error) {
 	var t T
 	b.apiUrl = "https://www.bitstamp.net/api/ticker/"
+
+	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
 		return bitcoin.BitcoinPrice{}, err
 	}
 
+	// Decode the JSON data
 	json.Unmarshal(content, &t)
 	high, _ := strconv.ParseFloat(t.High, 64)
 	last, _ := strconv.ParseFloat(t.Last, 64)

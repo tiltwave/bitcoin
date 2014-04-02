@@ -21,6 +21,7 @@ type Bitcoin interface {
 	GetPrice() (BitcoinPrice, error)
 }
 
+// Makes an API request
 func GetContent(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {

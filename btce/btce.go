@@ -11,6 +11,7 @@ type Btce struct {
 	price  bitcoin.BitcoinPrice
 }
 
+// Ticker represents the JSON data returned from the API request
 type T struct {
 	Ticker map[string]float64
 }
@@ -19,11 +20,14 @@ type T struct {
 func (b Btce) GetPrice() (bitcoin.BitcoinPrice, error) {
 	var t T
 	b.apiUrl = "https://btc-e.com/api/2/btc_usd/ticker"
+
+	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
 		return bitcoin.BitcoinPrice{}, err
 	}
 
+	// Decode the JSON data
 	json.Unmarshal(content, &t)
 
 	return bitcoin.BitcoinPrice{
