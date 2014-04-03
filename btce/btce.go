@@ -1,3 +1,5 @@
+// Get current Bitcoin exchange rate from Btc-e
+
 package btce
 
 import (
@@ -16,21 +18,28 @@ type T struct {
 	Ticker map[string]float64
 }
 
-// Implements GetPrice
-func (b Btce) GetPrice() (bitcoin.BitcoinPrice, error) {
+// Implements the Bitcion interface GetPrice method
+func (b Btce) GetPrice(ch chan bitcoin.BitcoinPrice) {
 	var t T
 	b.apiUrl = "https://btc-e.com/api/2/btc_usd/ticker"
 
 	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Btc-e",
+		}
+		ch <- price
+
+		return
 	}
 
 	// Decode the JSON data
 	json.Unmarshal(content, &t)
 
-	return bitcoin.BitcoinPrice{
+	price := bitcoin.BitcoinPrice{
 		CurBuy:  t.Ticker["last"],
 		CurSell: t.Ticker["sell"],
 		High:    t.Ticker["high"],
@@ -39,5 +48,7 @@ func (b Btce) GetPrice() (bitcoin.BitcoinPrice, error) {
 		Time:    int64(t.Ticker["updated"]),
 		Vol:     t.Ticker["vol"],
 		Name:    "Btc-e",
-	}, nil
+	}
+
+	ch <- price
 }

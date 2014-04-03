@@ -1,3 +1,5 @@
+// Get current Bitcoin exchange rate from Bitstamp
+
 package bitstamp
 
 import (
@@ -22,14 +24,22 @@ type T struct {
 	Ask       string
 }
 
-func (b Bitstamp) GetPrice() (bitcoin.BitcoinPrice, error) {
+// Implements the Bitcion interface GetPrice method
+func (b Bitstamp) GetPrice(ch chan bitcoin.BitcoinPrice) {
 	var t T
 	b.apiUrl = "https://www.bitstamp.net/api/ticker/"
 
 	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Bitstamp",
+		}
+		ch <- price
+
+		return
 	}
 
 	// Decode the JSON data
@@ -43,7 +53,7 @@ func (b Bitstamp) GetPrice() (bitcoin.BitcoinPrice, error) {
 	low, _ := strconv.ParseFloat(t.Low, 64)
 	ask, _ := strconv.ParseFloat(t.Ask, 64)
 
-	return bitcoin.BitcoinPrice{
+	price := bitcoin.BitcoinPrice{
 		CurBuy:  last,
 		CurSell: ask,
 		Bid:     bid,
@@ -53,6 +63,7 @@ func (b Bitstamp) GetPrice() (bitcoin.BitcoinPrice, error) {
 		Time:    time,
 		Vol:     vol,
 		Name:    "Bitstamp",
-	}, nil
+	}
+	ch <- price
 
 }

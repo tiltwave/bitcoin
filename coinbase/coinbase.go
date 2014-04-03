@@ -1,3 +1,5 @@
+// Get current Bitcoin exchange rate from Coinbase
+
 package coinbase
 
 import (
@@ -19,14 +21,22 @@ type T struct {
 	Currency string
 }
 
-func (b Coinbase) GetPrice() (bitcoin.BitcoinPrice, error) {
+// Implements the Bitcion interface GetPrice method
+func (b Coinbase) GetPrice(ch chan bitcoin.BitcoinPrice) {
 	var t T
 	b.apiUrl = "https://coinbase.com/api/v1/prices/buy"
 
 	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Coinbase",
+		}
+		ch <- price
+
+		return
 	}
 
 	// Decode the JSON data
@@ -36,16 +46,24 @@ func (b Coinbase) GetPrice() (bitcoin.BitcoinPrice, error) {
 	b.apiUrl = "https://coinbase.com/api/v1/prices/sell"
 	content, err = bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Coinbase",
+		}
+		ch <- price
+
+		return
 	}
 
 	json.Unmarshal(content, &t)
 	curSell, _ := strconv.ParseFloat(t.Amount, 64)
 
-	return bitcoin.BitcoinPrice{
+	price := bitcoin.BitcoinPrice{
 		CurBuy:  curBuy,
 		CurSell: curSell,
 		Name:    "Coinbase",
-	}, nil
+	}
 
+	ch <- price
 }

@@ -1,4 +1,5 @@
 // Get current Bitcoin exchange rate from Bitfinex
+
 package bitfinex
 
 import (
@@ -9,7 +10,6 @@ import (
 
 type Bitfinex struct {
 	apiUrl string
-	price  bitcoin.BitcoinPrice
 }
 
 // Ticker represents the JSON data returned from the API request
@@ -21,14 +21,15 @@ type T struct {
 	timestamp  string
 }
 
-// T2 represents the JSON data returned from the API request
+// Ticker represents the JSON data returned from the API request
 type T2 struct {
 	Low    string
 	High   string
 	Volume string
 }
 
-func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
+// Implements the Bitcion interface GetPrice method
+func (b Bitfinex) GetPrice(ch chan bitcoin.BitcoinPrice) {
 	var t T
 	var t2 T2
 
@@ -37,7 +38,14 @@ func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
 	// Request the current rate from the exchange
 	content, err := bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Bitfinex",
+		}
+		ch <- price
+
+		return
 	}
 
 	// Decode the JSON data
@@ -49,7 +57,14 @@ func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
 	b.apiUrl = "https://api.bitfinex.com/v1/today/btcusd"
 	content, err = bitcoin.GetContent(b.apiUrl)
 	if err != nil {
-		return bitcoin.BitcoinPrice{}, err
+		// Write error to the channel
+		price := bitcoin.BitcoinPrice{
+			Err:  err,
+			Name: "Bitfinex",
+		}
+		ch <- price
+
+		return
 	}
 
 	json.Unmarshal(content, &t2)
@@ -57,7 +72,7 @@ func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
 	vol, _ := strconv.ParseFloat(t2.Volume, 64)
 	low, _ := strconv.ParseFloat(t2.Low, 64)
 
-	return bitcoin.BitcoinPrice{
+	price := bitcoin.BitcoinPrice{
 		CurBuy:  curBuy,
 		CurSell: curSell,
 		High:    high,
@@ -65,6 +80,7 @@ func (b Bitfinex) GetPrice() (bitcoin.BitcoinPrice, error) {
 		Avg:     mid,
 		Vol:     vol,
 		Name:    "Bitfinex",
-	}, nil
+	}
 
+	ch <- price
 }
