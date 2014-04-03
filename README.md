@@ -5,8 +5,10 @@ Golang (Go) code for getting current Bitcoin price from different exchanges (coi
 
 How to run it?
 =============
-`$ go run main.go` 
+`$ go run main.go`
+
 `      Name |           Buy Price|    Sell Price|          High|           Low|           Avg|           Vol|`
+
 `           |                    |              |              |              |              |              |`
 `  Bitstamp |            430.0000|      431.7000|      494.9800|      418.3400|      451.4700|    39606.6339|`
 `     Btc-e |            428.4930|      427.4220|      498.7000|      416.0000|      457.3500| 15380266.8655|`
