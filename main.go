@@ -48,7 +48,7 @@ func pp(p bitcoin.BitcoinPrice) {
 
 // Print header
 func ph() {
-	fmt.Printf("Getting data... (make sure your terminal is wide enough the see each line\n\n")
+	fmt.Printf("Getting data... (make sure your terminal is wide enough the see each line)\n\n")
 	fmt.Printf("%10s |%20s| %13s| %13s| %13s| %13s| %14s| \n", "Name", "Buy Price", "Sell Price", "High", "Low", "Avg", "Vol")
 	fmt.Printf("%10s |%20s| %13s| %13s| %13s| %13s| %14s| \n", "", "", "", "", "", "", "")
 }
